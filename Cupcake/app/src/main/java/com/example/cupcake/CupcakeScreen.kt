@@ -80,8 +80,10 @@ fun CupcakeAppBar(
 }
 
 @Composable
-fun CupcakeApp(modifier: Modifier = Modifier, viewModel: OrderViewModel = viewModel()){
-    val navController = rememberNavController()
+fun CupcakeApp(
+    navController:NavHostController = rememberNavController(),
+    modifier: Modifier = Modifier,
+    viewModel: OrderViewModel = viewModel()) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = CupcakeScreen.valueOf(
         backStackEntry?.destination?.route ?: CupcakeScreen.Start.name
@@ -135,7 +137,12 @@ fun CupcakeApp(modifier: Modifier = Modifier, viewModel: OrderViewModel = viewMo
                     onNextButtonClicked = {
                         navController.navigate(CupcakeScreen.Summary.name)
                     },
-                    onCancelButtonClicked = { },
+                    onCancelButtonClicked = {
+                        cancelOrderAndNavigateToStart(
+                            viewModel,
+                            navController
+                        )
+                    },
                     options = uiState.pickupOptions,
                     onSelectionChanged = { viewModel.setDate(it) }
                 )
@@ -144,7 +151,12 @@ fun CupcakeApp(modifier: Modifier = Modifier, viewModel: OrderViewModel = viewMo
                 val context = LocalContext.current
                 OrderSummaryScreen(
                     orderUiState = uiState,
-                    onCancelButtonClicked = {},
+                    onCancelButtonClicked = {
+                        cancelOrderAndNavigateToStart(
+                            viewModel,
+                            navController
+                        )
+                    },
                     onSendButtonClicked = {
                         subject: String, summary: String ->
                         shareOrder(context, subject, summary)
